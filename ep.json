@@ -1,0 +1,14 @@
+{
+	"parts": [
+		{
+			"name": "ep_filemon",
+			"hooks": {
+				"eejsBlock_editbarMenuRight":"ep_filemon/filemon",
+				"eejsBlock_styles":"ep_filemon/filemon"
+			},
+			"client_hooks": {
+				"handleClientMessage_CUSTOM":"ep_filemon/static/js/filemon_client"
+			}
+		}
+	]
+}

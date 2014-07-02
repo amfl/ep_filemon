@@ -1,14 +1,26 @@
 var eejs = require('ep_etherpad-lite/node/eejs');
 var settings = require('ep_etherpad-lite/node/utils/Settings');
-var fs = require('fs');
 var padMessageHandler = require("../../src/node/handler/PadMessageHandler");
 
+var fs = require('fs');
+var path = require('path')
+
 // GLOBALS
-var watchDir = '/home/user/watch/';
+var watchDir = 'watchDirectory';
 var files = {};
 
 // Perform initial setup. Called once.
 function init() {
+	// Read watch directory from settings file
+	if (settings.ep_filemon.watchDirectory) {
+		watchDir = path.resolve(settings.ep_filemon.watchDirectory);
+	} else {
+		console.log('ep_filemon: No settings found for watchDirectory. Using default.')
+		watchDir = path.resolve(watchDir);
+	}
+	watchDir = watchDir + '/';
+	console.log("ep_filemon: Watching directory: " + watchDir)
+
 	var dirContents = fs.readdirSync(watchDir);
 
 	// Process each file.

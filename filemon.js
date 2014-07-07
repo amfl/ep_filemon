@@ -7,7 +7,7 @@ var path              = require('path')
 // GLOBALS
 var watchDir = 'watchDirectory';  // Overridden by anything in settings
 var files    = {};  // Filenames and their contents in the watched directory.
-                    // Used to construct the message displayed.
+										// Used to construct the message displayed.
 var TAG      = 'ep_filemon: ';  // Tag used for logging
 
 // Perform initial setup. Called once.
@@ -35,7 +35,9 @@ function init() {
 			delete files[filename];
 		}
 		processFile(filename, function(filename, err, data) {
-			sendMessageToAll({'contents': createMessage()});
+			var jsonMsg = {}
+			jsonMsg[filename] = data;
+			sendMessageToAll({'contents': jsonMsg});
 		});
 	});
 }
@@ -61,19 +63,6 @@ function sendMessageToAll(json_msg) {
 	});
 }
 
-// Creates the actual message that is displayed.
-function createMessage() {
-	var contents = '';
-	
-	// Go through the file dictionary in alphabetical order
-	// to construct the final message.
-	var nameArray = Object.keys(files).sort();
-	for (var i = 0, len = nameArray.length; i < len; i++) {
-		contents = contents + files[nameArray[i]];
-	}
-	return contents;
-}
-
 // Given a filename, modify the global file dictionary accordingly.
 function processFile(filename, cb) {
 	// Read the contents of the changed file and update the bar
@@ -91,14 +80,33 @@ function processFile(filename, cb) {
 //////////////////////////////////////////////////////////////////
 
 exports.eejsBlock_styles = function (hook_name, args, cb){
-  args.content = args.content + '<link href="../static/plugins/ep_filemon/static/css/filemon.css" rel="stylesheet">';
-  return cb();
+	args.content = args.content + '<link href="../static/plugins/ep_filemon/static/css/filemon.css" rel="stylesheet">';
+	return cb();
 }
 
 exports.eejsBlock_editbarMenuRight = function(hook_name, args, cb){
-	args.content = '<div id="filemon"><div id="filemon_content">'+
-		createMessage()+'</div></div>' + args.content;
+	args.content = '<div id="ep_filemon"><div id="ep_filemon_content"></div></div>' + args.content;
 	return cb();
+}
+exports.handleMessage = function(hook, context, cb) {
+	// Figure out if we need to deal with this message
+	var isFilemonMessage = false;
+	if ( context.message.type == 'COLLABROOM' ) {
+		if(context.message.data){
+			if(context.message.data.type){
+				if(context.message.data.type === 'filemon'){
+					isFilemonMessage = true;
+				}
+			}
+		}
+	}
+
+	if (isFilemonMessage) {
+		console.log('filemon message received.');
+		sendMessageToAll({'contents': files});
+		cb([null]); // Mark the message as dealt with
+	}
+	cb(false); // This message isn't our problem!
 }
 
 //////////////////////////////////////////////////////////////////

@@ -1,10 +1,10 @@
-#filemon {
+#ep_filemon {
 	display: table;
 	height: 26px; /* Same size as buttons */
 	float: left;
 	margin-right: 10px;
 }
-#filemon_content {
+#ep_filemon_content {
 	display: table-cell;
 	vertical-align: middle;
 	text-align: right;

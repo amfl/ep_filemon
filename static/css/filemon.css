@@ -8,4 +8,9 @@
 	display: table-cell;
 	vertical-align: middle;
 	text-align: right;
+	width: 0px;
+}
+#ep_filemon_content > div {
+	float: right;
+	margin-left: 1em;
 }

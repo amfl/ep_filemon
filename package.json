@@ -1,6 +1,6 @@
 {
 	"name": "ep_filemon",
-	"version": "0.0.1",
+	"version": "1.5.0",
 	"description": "Monitors a file on the server and displays the text on the toolbar.",
 	"author": "amfl (Amorphous Flux) <amorphousflux@gmail.com>",
 	"contributors": [],

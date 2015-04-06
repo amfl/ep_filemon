@@ -12,7 +12,7 @@ function requestAll() {
 	pad.collabClient.sendMessage(message); // Send the request through the server to create a tunnel to the client
 }
 
-exports.handleClientMessage_CUSTOM = function(hook, context, wut){
+exports.handleClientMessage_shoutMessage = function(hook, context, wut){
 	// Create divs and things.
 	contents = context.payload.contents
 

@@ -3,6 +3,8 @@ var settings          = require('ep_etherpad-lite/node/utils/Settings');
 var padMessageHandler = require("../../src/node/handler/PadMessageHandler");
 var fs                = require('fs');
 var path              = require('path')
+var socketio;
+
 
 // GLOBALS
 var watchDir = 'watchDirectory';  // Overridden by anything in settings
@@ -47,20 +49,15 @@ function sendMessageToAll(json_msg) {
 	var msg = {
 		type: "COLLABROOM",
 		data: {
-			type: "CUSTOM",
+			type: "shoutMessage",
 			payload: json_msg,
 		}
 	};
 
-	// Ripped from https://github.com/JohnMcLear/ep_stop_writing/blob/master/handleMessage.js
-	var sessions = padMessageHandler.sessioninfos;
-	// TODO: Optimize me
-	Object.keys(sessions).forEach(function(key){
-		var session = sessions[key]
-		padMessageHandler.handleCustomObjectMessage(msg, key, function(){
-			// TODO: Error handling
-		}); // Send a message to this session
-	});
+	var clients = socketio.sockets.adapter.nsp.connected;
+	for(var client in clients) {
+		clients[client].send(msg);
+	}
 }
 
 // Given a filename, modify the global file dictionary accordingly.
@@ -106,7 +103,13 @@ exports.handleMessage = function(hook, context, cb) {
 		sendMessageToAll({'contents': files});
 		cb([null]); // Mark the message as dealt with
 	}
-	cb(false); // This message isn't our problem!
+	else {
+		cb(false); // This message isn't our problem!
+	}
+}
+
+exports.socketio = function(hook_name, args, cb) {
+	socketio = args.io;
 }
 
 //////////////////////////////////////////////////////////////////
